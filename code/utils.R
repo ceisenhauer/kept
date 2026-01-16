@@ -1,17 +1,3 @@
-#remove_problem_genes <- function(genes) {
-  #out <- genes |>
-    #str_split(';') |>
-    #map_chr(~{
-      #filtered <- .x[!str_detect(.x, "[%?$]")]
-      #cleaned <- str_remove_all(filtered, "[*^]")
-      #paste(cleaned, collapse = ";")
-    #}) |>
-    #na_if("") |>
-    #na_if("-")
-
-  #return(out)
-#}
-
 remove_problem_genes <- function(genes) {
   sapply(strsplit(genes, ';'), function(items) {
     filtered <- items[!grepl("[%?$]", items)]

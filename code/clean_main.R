@@ -118,29 +118,3 @@ df |>
 df |>
   rio::export(here::here('data', 'clean', 'data_clean.csv'))
 
-tmp <- df |>
-  mutate(
-    # add resistance columns for antibiotics dependant on multiple enzymees
-    monobactam = !is.na(Bla_ESBL_acquired) | !is.na(Bla_ESBL_inhR_acquired) |
-                 grepl('^KPC|^GES', Bla_Carb_acquired),
-    n_mdr = as.integer(!is.na(AGly_acquired)) + 
-            as.integer(!is.na(Flq_acquired) | !is.na(Flq_mutations)) +
-            as.integer(!is.na(Sul_acquired) | !is.na(Tmt_acquired)) + 
-            as.integer(!is.na(Tgc_acquired)) +
-            as.integer(!is.na(Phe_acquired)) + 
-            as.integer(!is.na(Tet_acquired)) + 
-            as.integer(!is.na(Fcyn_acquired)) +
-            as.integer(!is.na(Col_acquired) | !is.na(Col_mutations)),
-    MDR_betalactamase = !is.na(Bla_ESBL_acquired) | !is.na(Bla_ESBL_inhR_acquired) |
-                        !is.na(Bla_Carb_acquired),
-    MDR_wo_betalactamase = !MDR_betalactamase &
-                           n_mdr >= 3,
-    MDR = MDR_betalactamase | MDR_wo_betalactamase,
-    XDR = ((!is.na(Bla_ESBL_acquired) | !is.na(Bla_ESBL_inhR_acquired)) & 
-           is.na(Bla_Carb_acquired) & 
-           n_mdr >= 7) |
-          (!is.na(Bla_Carb_acquired) & (as.integer(monobactam) + n_mdr) >= 7)
-  )
-
-
-
