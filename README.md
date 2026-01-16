@@ -1,4 +1,4 @@
-Fun with *Klebsiella* <img src='logo.svg' align='right' alt='' width='200' />
+Fun with *Klebsiella* <img src='www/logo.svg' align='right' alt='' width='200' />
 ====================================================================================================
 
 <!-- badges: start -->
