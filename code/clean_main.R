@@ -60,18 +60,87 @@ df <- df_raw |>
 
     # remove problem genes (%, ?, $) and remove [^, *] characters and harmonize NA style
     across(ends_with('_acquired'), remove_problem_genes),
-    Bla_chr = remove_problem_genes(Bla_chr)
+    across(ends_with('_mutations'), ~na_if(., "-")),
+    Bla_chr = remove_problem_genes(Bla_chr),
 
-    # clean tetR
+    # clean tetR and Mrx
     Tet_acquired = exclude_genes(Tet_acquired, 'tetR'),
+    MLS_acquired = exclude_genes(MLS_acquired, 'Mrx'),
 
     # create gene clusters
     Tgc_acquired = create_gene_cluster(Tgc_acquired,
                                        cluster_genes = c('tmexC1', 'tmexD1', 'toprJ1'),
                                        cluster_name = 'tmexCD1-toprJ1'),
-    MLS_acquired = create_gene_cluster(MLS_acquired,
-                                       cluster_genes = c('Mrx', 'mphA'),
-                                       cluster_name = 'mphA-mrx')
+
+    # add resistance columns for antibiotics dependant on multiple enzymees
+    monobactam = !is.na(Bla_ESBL_acquired) | !is.na(Bla_ESBL_inhR_acquired) |
+                 grepl('^KPC|^GES', Bla_Carb_acquired),
+    n_mdr = as.integer(!is.na(AGly_acquired)) + 
+            as.integer(!is.na(Flq_acquired) | !is.na(Flq_mutations)) +
+            as.integer(!is.na(Sul_acquired) | !is.na(Tmt_acquired)) + 
+            as.integer(!is.na(Tgc_acquired)) +
+            as.integer(!is.na(Phe_acquired)) + 
+            as.integer(!is.na(Tet_acquired)) + 
+            as.integer(!is.na(Fcyn_acquired)) +
+            as.integer(!is.na(Col_acquired) | !is.na(Col_mutations)),
+    MDR_betalactamase = !is.na(Bla_ESBL_acquired) | !is.na(Bla_ESBL_inhR_acquired) |
+                        !is.na(Bla_Carb_acquired),
+    MDR_wo_betalactamase = !MDR_betalactamase &
+                           n_mdr >= 3,
+    MDR = MDR_betalactamase | MDR_wo_betalactamase,
+    XDR = ((!is.na(Bla_ESBL_acquired) | !is.na(Bla_ESBL_inhR_acquired)) & 
+           is.na(Bla_Carb_acquired) & 
+           n_mdr >= 7) |
+          (!is.na(Bla_Carb_acquired) & (as.integer(monobactam) + n_mdr) >= 7),
+
+    # fix K_locus and O_locus
+    K_locus = case_when(K_locus_confidence == 'Untypeable' ~ 'Untypeable',
+                        .default = K_locus),
+    K_type = case_when(K_locus_confidence == 'Untypeable' ~ 'Untypeable',
+                        .default = K_type),
+    O_locus = case_when(O_locus_confidence == 'Untypeable' ~ 'Untypeable',
+                        .default = O_locus),
+    O_type = case_when(O_locus_confidence == 'Untypeable' ~ 'Untypeable',
+                        .default = O_type)
+  ) |>
+
+  # remove unnecessary columns
+  select(-species_match, -starts_with('clb'), -starts_with('iro'), -starts_with('iuc'),
+         -starts_with('ybt'), -ends_with('hits'), -contig_count, -largest_contig, -gapA, 
+         -infB, -mdh, -pgi, -phoE, -rpoB, -tonB, -fyuA, -irp2, -irp1, -iutA, n_mdr, n_ambiguous)
+
+
+
+# export -------------------------------------------------------------------------------------------
+df |>
+  rio::export(here::here('data', 'clean', 'data_clean.rds'))
+
+df |>
+  rio::export(here::here('data', 'clean', 'data_clean.csv'))
+
+tmp <- df |>
+  mutate(
+    # add resistance columns for antibiotics dependant on multiple enzymees
+    monobactam = !is.na(Bla_ESBL_acquired) | !is.na(Bla_ESBL_inhR_acquired) |
+                 grepl('^KPC|^GES', Bla_Carb_acquired),
+    n_mdr = as.integer(!is.na(AGly_acquired)) + 
+            as.integer(!is.na(Flq_acquired) | !is.na(Flq_mutations)) +
+            as.integer(!is.na(Sul_acquired) | !is.na(Tmt_acquired)) + 
+            as.integer(!is.na(Tgc_acquired)) +
+            as.integer(!is.na(Phe_acquired)) + 
+            as.integer(!is.na(Tet_acquired)) + 
+            as.integer(!is.na(Fcyn_acquired)) +
+            as.integer(!is.na(Col_acquired) | !is.na(Col_mutations)),
+    MDR_betalactamase = !is.na(Bla_ESBL_acquired) | !is.na(Bla_ESBL_inhR_acquired) |
+                        !is.na(Bla_Carb_acquired),
+    MDR_wo_betalactamase = !MDR_betalactamase &
+                           n_mdr >= 3,
+    MDR = MDR_betalactamase | MDR_wo_betalactamase,
+    XDR = ((!is.na(Bla_ESBL_acquired) | !is.na(Bla_ESBL_inhR_acquired)) & 
+           is.na(Bla_Carb_acquired) & 
+           n_mdr >= 7) |
+          (!is.na(Bla_Carb_acquired) & (as.integer(monobactam) + n_mdr) >= 7)
   )
+
 
 
