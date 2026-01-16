@@ -31,7 +31,7 @@ exclude_genes <- function(genes, to_exclude) {
     filtered <- items[!items %in% to_exclude]
     result <- paste(filtered, collapse = ';')
 
-    if (result == "") {
+    if (result == '' || result == 'NA') {
       return(NA_character_)
     }
 
@@ -50,10 +50,29 @@ create_gene_cluster <- function(genes, cluster_genes, cluster_name) {
 
     result <- paste(filtered, collapse = ';')
 
-    if (result == '') {
+    if (result == '' || result == 'NA') {
       return(NA_character_)
     }
 
     return(result)
   })
 }
+
+
+
+
+
+# Function to extract unique genes from a column
+extract_unique_genes <- function(column) {
+  # Split all entries by semicolon, unlist, get unique, sort
+  unique_genes <- column |>
+    na.omit() |>
+    strsplit(";") |>
+    unlist() |>
+    unique() |>
+    sort()
+  
+  return(unique_genes)
+}
+
+
