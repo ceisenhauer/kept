@@ -7,7 +7,7 @@ experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](h
  <!--badges: end -->
 
 
-The present repository contains code needed for several components of the project: *[insert name here]*, including:
+The present repository contains code needed for some components of the project: *[insert name here]*, including:
 
 * Cleaning of raw and meta datasets
 * Other stuff, presumably
