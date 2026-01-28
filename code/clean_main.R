@@ -103,12 +103,15 @@ df <- df_raw |>
     O_type = case_when(O_locus_confidence == 'Untypeable' ~ 'Untypeable',
                         .default = O_type),
 
+    # remove truncation on rmpA(2)
     across(c(rmpA, rmpA2), mark_truncated_genes),
          
+    # remove versions (.v1 / .v2) 
     across(c(AGly_acquired, Flq_acquired, MLS_acquired, Phe_acquired, Tet_acquired, 
             Tmt_acquired, Bla_acquired, Bla_Carb_acquired, Bla_ESBL_acquired),
           ~ gsub("\\.v[12]", "", .)),
 
+    # remove -[1-9]+LV tail from ST
     ST = gsub('-\\d+LV', '', ST)
   ) |>
 
