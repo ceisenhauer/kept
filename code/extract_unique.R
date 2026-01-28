@@ -25,7 +25,7 @@ df <- rio::import(here::here('data', 'clean', 'data_clean.rds'))
 
 tmp <- df |>
   select(O_locus, O_type, K_locus, K_type, Yersiniabactin,  YbST, CbST, Colibactin, AbST, 
-         Aerobactin, SmST, Salmochelin, RmST, RmpADC, rmpA2, AGly_acquired, Col_acquired, 
+         Aerobactin, SmST, Salmochelin, RmST, RmpADC, rmpA, rmpA2, AGly_acquired, Col_acquired, 
          Fcyn_acquired, Flq_acquired, Gly_acquired, MLS_acquired, Phe_acquired, Rif_acquired, 
          Sul_acquired, Tet_acquired, Tmt_acquired, Bla_acquired, Bla_inhR_acquired, 
          Bla_ESBL_acquired, Bla_ESBL_inhR_acquired, Bla_Carb_acquired, Bla_chr, Col_mutations, 

@@ -143,8 +143,10 @@ meta <- rio::import(here::here('data', 'ref', 'metadados.csv')) |>
   distinct() |>
 
   # select only final vars
-  select(strain, year, sample_type, country, region)
+  select(strain, year, sample_type, country, region, income)
 
+
+# some strains have duplicated meta-data -- remove them entirely
 dupes <- meta |>
   count(strain) |>
   filter(n > 1) |>

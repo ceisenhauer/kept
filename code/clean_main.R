@@ -101,7 +101,15 @@ df <- df_raw |>
     O_locus = case_when(O_locus_confidence == 'Untypeable' ~ 'Untypeable',
                         .default = O_locus),
     O_type = case_when(O_locus_confidence == 'Untypeable' ~ 'Untypeable',
-                        .default = O_type)
+                        .default = O_type),
+
+    across(c(rmpA, rmpA2), mark_truncated_genes),
+         
+    across(c(AGly_acquired, Flq_acquired, MLS_acquired, Phe_acquired, Tet_acquired, 
+            Tmt_acquired, Bla_acquired, Bla_Carb_acquired, Bla_ESBL_acquired),
+          ~ gsub("\\.v[12]", "", .)),
+
+    ST = gsub('-\\d+LV', '', ST)
   ) |>
 
   # remove unnecessary columns

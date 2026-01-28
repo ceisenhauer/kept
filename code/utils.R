@@ -45,20 +45,37 @@ create_gene_cluster <- function(genes, cluster_genes, cluster_name) {
 }
 
 
+mark_truncated_genes <- function(genes) {
+  genes <- sapply(genes, function(gene) {
+      if (grepl("-[0-9]+%", gene)) {
+        return("truncated")
+      } else {
+        return(gene)
+      }
 
+    result <- paste(filtered, collapse = ';')
 
+    if (result == '' || result == 'NA') {
+      return(NA_character_)
+    }
 
-# Function to extract unique genes from a column
-extract_unique_genes <- function(column) {
-  # Split all entries by semicolon, unlist, get unique, sort
-  unique_genes <- column |>
-    na.omit() |>
-    strsplit(";") |>
-    unlist() |>
-    unique() |>
-    sort()
-  
-  return(unique_genes)
+    return(result)
+  })
 }
+
+
+
+## Function to extract unique genes from a column
+#extract_unique_genes <- function(column) {
+  ## Split all entries by semicolon, unlist, get unique, sort
+  #unique_genes <- column |>
+    #na.omit() |>
+    #strsplit(";") |>
+    #unlist() |>
+    #unique() |>
+    #sort()
+  
+  #return(unique_genes)
+#}
 
 
